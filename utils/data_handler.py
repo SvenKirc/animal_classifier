@@ -4,9 +4,7 @@ from torch.utils.data import Dataset, DataLoader, random_split
 from PIL import Image
 import os
 
-from utils.config import transform
-
-labels = {"butterfly": 0, "cat": 1, "chicken": 2, "cow": 3, "dog": 4, "elephant": 5, "horse": 6, "sheep": 7, "spider": 8, "squirrel": 9}
+from utils.config import transform, labels
 
 class Pet_Data(Dataset):
     def __init__(self, data_directory):

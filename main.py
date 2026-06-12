@@ -2,6 +2,7 @@ import torch
 from torch import nn
 
 from tqdm import tqdm
+from PIL import Image
 
 from utils import data_handler, model, config
 
@@ -76,11 +77,26 @@ def train(classifier):
         if epoch % 10 == 0 and epoch > 0:
             torch.save(classifier.state_dict(), "animal_classifier.pth")
 
+def inference(animal_classifier):
+    animal_classifier.load_state_dict(torch.load("animal_classifier.pth", weights_only=True))
+    animal_classifier.eval()
+    with torch.inference_mode():
+        filename = input("Please prompt the location (relative) of the imagefile that you want to classify (including filename):\n")
+        image = config.transform(Image.open(filename).convert("RGB")).unsqueeze(0).to(device)
+        logits = animal_classifier(image)
+        _, classification = logits.max(1)
+        for label in config.labels:
+            if config.labels[label] == classification.item():
+                animal_name = label
+        print(f"Yoooo thats a {animal_name}")
+
 def main():
     animal_classifier = model.Animal_Classifier()
     animal_classifier = animal_classifier.to(device)
     if config.training == True:
         train(animal_classifier)
+    else:
+        inference(animal_classifier)
     
 if __name__ == "__main__":
     main()
