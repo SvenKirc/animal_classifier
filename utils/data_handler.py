@@ -1,5 +1,5 @@
 import torch
-from torch.utils.data import Dataset
+from torch.utils.data import Dataset, DataLoader, random_split
 
 from PIL import Image
 import os
@@ -40,14 +40,19 @@ class Pet_Data(Dataset):
     def __len__(self):
         return self.len
 
-def get_data():
+def get_dataloader():
     print("Processing Data")
     data_directory = "../dataset"
     pet_data = Pet_Data(data_directory)
-    print(len(pet_data))            
+    number_training_data = int(2/3 * len(pet_data))
+    number_test_data = len(pet_data) - number_training_data
+    train_data, test_data = random_split(pet_data, [number_training_data, number_test_data])
+    train_dataloader = DataLoader(train_data, 64, True)
+    test_dataloader = DataLoader(test_data, 64, False)
+    return train_dataloader, test_dataloader
 
 def main():
-    get_data()
+    train_dataloader, test_dataloader = get_dataloader()
 
 if __name__ == "__main__":
     main()
